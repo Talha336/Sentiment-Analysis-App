@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen">
+    <div class="text-center mt-10">
+        <h1 class="text-4xl font-bold">Sentiment Analysis 📝 </h1>
+        <p class="text-gray-400 mt-2">Discover the sentiment of your text in real-time!</p>
+    </div>
+
+    <div class="mt-8 w-full max-w-md">
+        <textarea id="textInput" rows="4" placeholder="Type your text here..." 
+            class="w-full bg-gray-800 border border-gray-600 rounded-lg p-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        <button id="analyzeBtn" 
+            class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold transition-all">
+            Generate Sentiment
+        </button>
+    </div>
+
+    <div id="result" 
+        class="mt-8 w-full max-w-md bg-gray-800 border border-gray-600 rounded-lg p-4 text-center">
+        <p class="text-gray-400">Your sentiment result will appear here.</p>
+    </div>
+
+    <script>
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const textInput = document.getElementById('textInput');
+        const resultDiv = document.getElementById('result');
+
+        analyzeBtn.addEventListener('click', async () => {
+            const text = textInput.value;
+            if (!text.trim()) {
+                resultDiv.innerHTML = '<p class="text-red-500">Please enter some text.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text }),
+                });
+                const data = await response.json();
+                if (data.error) {
+                    resultDiv.innerHTML = `<p class="text-red-500">${data.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="text-xl font-bold">${data.sentiment} ${data.emoji}</p>
+                        <p class="text-gray-400">Confidence: ${(data.score * 100).toFixed(2)}%</p>
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = '<p class="text-red-500">An error occurred. Please try again.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
