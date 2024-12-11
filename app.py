@@ -33,4 +33,4 @@ def analyze_sentiment():
 
 if __name__ == '__main__':
     # Ensure the app runs on any host (useful for development)
-    app.run(debug=True)
+    app.run()
